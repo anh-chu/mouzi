@@ -20,23 +20,22 @@ try {
   await until(async () => { page = browser.contexts().flatMap(c => c.pages()).find(p => p.url().includes('settings')); return !!page; });
   page.on('pageerror', e => errors.push(e.stack || e.message));
   await page.getByRole('button', { name: 'Watched Folders' }).waitFor({timeout: 30000});
-  await page.evaluate(async () => {
-    const api = window.__TAURI_INTERNALS__;
-    const invoke = api.invoke.bind(api);
-    api.invoke = async (cmd, args) => {
-      if (cmd === 'take_review_request_cmd') return [];
-      if (cmd === 'preview_cmd') return { id: 'mock-plan', entries: [{id:'mock-1', source:'C:\\test\\file.txt', destination:'C:\\test\\Sorted\\file.txt', rule:'Documents', action:'move', size:123, warning:false, error:null}] };
-      if (cmd === 'get_settings_cmd') return { ...(await invoke(cmd, args)), ai_enabled:true, ai_auto_move:true };
-      if (cmd === 'auto_triage_preview_cmd') return { classifications: [{path:'C:\\test\\file.txt', verdict:'trash', confidence:90, probabilities:{trash:0.9,keep:0.05,unsure:0.05}}], moves: [{id:'mock-1', source:'C:\\test\\file.txt', success:true, error:null}] };
-      if (cmd === 'discard_preview_cmd') return null;
-      return invoke(cmd, args);
-    };
-  });
-  await page.getByRole('button', { name: 'Review queue' }).click();
-  await page.getByRole('heading', { name: 'Review queue' }).waitFor({timeout: 30000});
-  await page.getByText('C:\\test\\file.txt', {exact:false}).first().waitFor({timeout: 30000});
+  // Close the initial settings window, then exercise the actual popup command
+  // that must create a fresh webview. Creating it synchronously deadlocks on Windows.
+  await page.evaluate(() => window.__TAURI_INTERNALS__.invoke('show_popup_cmd'));
+  let popup;
+  await until(async () => { popup = browser.contexts().flatMap(c => c.pages()).find(p => p.url().includes('popup')); return !!popup; }, 30000);
+  await popup.getByRole('button', {name:'Organize Now', exact:true}).waitFor({timeout:30000});
+  await popup.evaluate(() => window.__TAURI_INTERNALS__.invoke('close_settings'));
+  await until(async () => page.isClosed(), 30000);
+  await popup.getByRole('button', {name:'Organize Now', exact:true}).click();
+  await until(async () => { page = browser.contexts().flatMap(c => c.pages()).find(p => p.url().includes('settings') && !p.isClosed()); return !!page; }, 30000);
+  page.on('pageerror', e => errors.push(e.stack || e.message));
+  await page.getByRole('heading', {name:'Review queue', exact:true}).waitFor({timeout:30000});
+  await page.getByRole('button', {name:'Refresh preview', exact:true}).waitFor({timeout:30000});
   if (errors.length) throw Error(errors.join('\n'));
-  console.log('Review window opened and rendered mock automatic Jev result');
+  console.log('Organize Now created and opened the review window');
+
 } finally {
   await browser?.close();
   child?.kill();

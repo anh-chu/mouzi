@@ -23,10 +23,12 @@ pub fn setup_tray(app: &AppHandle, lang: &str) -> Result<(), Box<dyn std::error:
                 app.exit(0);
             }
             "settings" => {
-                show_settings_window(app);
+                let app = app.clone();
+                tauri::async_runtime::spawn(async move { show_settings_window(&app); });
             }
             "clean" => {
-                crate::commands::show_review_cmd(app.clone(), Vec::new());
+                let app = app.clone();
+                tauri::async_runtime::spawn(async move { crate::commands::show_review_cmd(app, Vec::new()).await; });
             }
             _ => {}
         })
@@ -39,7 +41,8 @@ pub fn setup_tray(app: &AppHandle, lang: &str) -> Result<(), Box<dyn std::error:
             {
                 if button == MouseButton::Left && button_state == tauri::tray::MouseButtonState::Up
                 {
-                    show_popup_window(tray.app_handle());
+                    let app = tray.app_handle().clone();
+                    tauri::async_runtime::spawn(async move { show_popup_window(&app); });
                 }
             }
         });

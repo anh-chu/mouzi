@@ -99,7 +99,7 @@ pub fn set_only_new_cmd(app: tauri::AppHandle, id: i64, enabled: bool) -> Result
 }
 
 #[tauri::command]
-pub fn show_review_cmd(app: tauri::AppHandle, paths: Vec<String>) {
+pub async fn show_review_cmd(app: tauri::AppHandle, paths: Vec<String>) {
     *app.state::<AppState>().review_request.lock().unwrap() = Some(paths);
     crate::tray::show_settings_window(&app);
     use tauri::Emitter;
@@ -507,7 +507,7 @@ pub fn get_pending_open_folder_cmd(state: tauri::State<AppState>) -> Option<Stri
 }
 
 #[tauri::command]
-pub fn show_popup_cmd(app: AppHandle) {
+pub async fn show_popup_cmd(app: AppHandle) {
     crate::tray::show_popup_window(&app);
 }
 
