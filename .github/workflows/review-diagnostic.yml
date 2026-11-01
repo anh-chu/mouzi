@@ -1,0 +1,25 @@
+name: Review window diagnostic
+on:
+  push:
+    branches: [jev-triage]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  review:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: mouzi-jev-windows
+          path: src-tauri/target/release
+          run-id: 41290823784
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: npm ci
+      - run: npm install --no-save --package-lock=false playwright
+      - run: node tests/jev-review-smoke.mjs
