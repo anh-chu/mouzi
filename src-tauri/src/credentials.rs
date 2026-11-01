@@ -1,4 +1,4 @@
-﻿use crate::db;
+use crate::db;
 
 // Older development builds wrote this value into SQLite. Move it only after the
 // OS credential store has accepted it, so an unavailable store cannot lose it.

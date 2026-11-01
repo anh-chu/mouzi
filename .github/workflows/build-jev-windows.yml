@@ -1,4 +1,4 @@
-﻿name: Build Mouzi Jev for Windows
+name: Build Mouzi Jev for Windows
 on:
   workflow_dispatch:
   push:
