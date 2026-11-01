@@ -225,12 +225,24 @@ async fn request_batch(
 }
 
 fn normalize_verdict(raw: &str) -> String {
-    let value = raw.trim().to_lowercase();
-    if value.contains("trash") || value.contains("delete") || value.contains("discard") {
-        "trash".into()
-    } else if value.contains("keep") || value.contains("retain") || value.contains("save") {
-        "keep".into()
-    } else {
-        "unsure".into()
+    match raw.trim().to_ascii_lowercase().as_str() {
+        "trash" => "trash".into(),
+        "keep" => "keep".into(),
+        _ => "unsure".into(),
     }
+}
+
+#[derive(Serialize)]
+pub struct AutomaticTriage {
+    pub classifications: Vec<Classification>,
+    pub moves: Vec<crate::operations::OperationResult>,
+}
+
+pub async fn classify_plan_and_move(id: &str, trigger: &str) -> Result<AutomaticTriage, String> {
+    let entries = crate::operations::planned_entries(id)?;
+    let paths = entries.iter().filter(|e| !e.warning).map(|e| e.source.clone()).collect();
+    let classifications = classify(describe_paths(paths)).await?;
+    let trash: Vec<String> = classifications.iter().filter(|c| c.verdict == "trash").map(|c| c.path.clone()).collect();
+    let moves = crate::operations::auto_move_jev(id, &trash, trigger)?;
+    Ok(AutomaticTriage { classifications, moves })
 }

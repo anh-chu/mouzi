@@ -197,6 +197,65 @@ fn combined_review_applies_move_and_trash_in_one_run() {
 }
 
 #[test]
+fn automatic_jev_move_is_opt_in_checked_and_undoable() {
+    let f = Fixture::new();
+    db::add_rule(&f.rule()).unwrap();
+    let original_settings = db::get_settings().unwrap();
+    let mut settings = original_settings.clone();
+    let trash_folder = f.root.join("delete");
+    fs::create_dir(&trash_folder).unwrap();
+    settings.ai_enabled = true;
+    settings.ai_auto_move = false;
+    settings.ai_delete_folder = trash_folder.to_string_lossy().into();
+    db::update_settings(&settings).unwrap();
+    let source = f.write("trash.txt", "new data");
+    fs::write(trash_folder.join("trash.txt"), "existing data").unwrap();
+    let p = op::preview(None).unwrap();
+    let paths = vec![source.to_string_lossy().into_owned()];
+    assert!(op::auto_move_jev(&p.id, &paths, "manual").is_err());
+    assert!(source.exists());
+    settings.ai_auto_move = true;
+    db::update_settings(&settings).unwrap();
+    let results = op::auto_move_jev(&p.id, &paths, "manual").unwrap();
+    assert_eq!(results.len(), 1);
+    assert!(results[0].success);
+    assert_eq!(fs::read_to_string(trash_folder.join("trash.txt")).unwrap(), "existing data");
+    assert_eq!(fs::read_to_string(trash_folder.join("trash (1).txt")).unwrap(), "new data");
+    let logs = db::get_recent_logs(-1).unwrap();
+    assert_eq!(logs[0].action, "move");
+    assert!(op::undo_one(logs[0].id.unwrap()).unwrap());
+    assert!(source.exists());
+    op::discard(&p.id);
+    db::update_settings(&original_settings).unwrap();
+}
+
+#[test]
+fn automatic_jev_move_rejects_changed_file_and_manual_scheduled_folder() {
+    let f = Fixture::new();
+    db::add_rule(&f.rule()).unwrap();
+    let original_settings = db::get_settings().unwrap();
+    let mut settings = original_settings.clone();
+    let trash_folder = f.root.join("delete");
+    fs::create_dir(&trash_folder).unwrap();
+    settings.ai_enabled = true;
+    settings.ai_auto_move = true;
+    settings.ai_delete_folder = trash_folder.to_string_lossy().into();
+    db::update_settings(&settings).unwrap();
+    let source = f.write("changed.txt", "old");
+    let paths = vec![source.to_string_lossy().into_owned()];
+    let p = op::preview(None).unwrap();
+    fs::write(&source, "new content").unwrap();
+    assert!(!op::auto_move_jev(&p.id, &paths, "manual").unwrap()[0].success);
+    assert!(source.exists());
+    op::discard(&p.id);
+    let p = op::preview(None).unwrap();
+    assert!(!op::auto_move_jev(&p.id, &paths, "scheduled").unwrap()[0].success);
+    assert!(source.exists());
+    op::discard(&p.id);
+    db::update_settings(&original_settings).unwrap();
+}
+
+#[test]
 fn runs_filters_safe_partial_undo_and_no_automatic_redo() {
     let f = Fixture::new();
     db::add_rule(&f.rule()).unwrap();

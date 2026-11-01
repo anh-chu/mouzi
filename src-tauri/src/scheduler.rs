@@ -7,6 +7,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration as StdDuration;
 use tauri::{AppHandle, Emitter};
+use tauri_plugin_notification::NotificationExt;
 
 const CHECK_INTERVAL_SECONDS: u64 = 60;
 
@@ -74,8 +75,12 @@ fn check_and_run(
                 guard.get(&slot).copied() == Some(today)
             };
             if !already_run {
-                perform_scheduled_clean(app_handle)?;
+                let result = perform_scheduled_clean(app_handle);
                 last_run_dates.lock().unwrap().insert(slot, today);
+                if let Err(error) = result {
+                    let _ = app_handle.notification().builder().title("Mouzi: scheduled organization failed").body(&error).show();
+                    return Err(error);
+                }
             }
         }
     }
@@ -92,7 +97,29 @@ fn parse_time(time_str: &str) -> Result<NaiveTime, String> {
 fn perform_scheduled_clean(app_handle: &AppHandle) -> Result<(), String> {
     println!("[scheduler] running scheduled organization");
 
+    let settings = get_settings().map_err(|e| e.to_string())?;
     let folders = get_watched_folders().map_err(|e| e.to_string())?;
+    if settings.ai_auto_move {
+        if !settings.ai_enabled { return Err("Enable Jev or turn off automatic Jev moving in Settings".into()); }
+        let mut paths = Vec::new();
+        for folder in folders.iter().filter(|f| f.enabled && crate::db::is_folder_auto_mode(&f.mode)) {
+            let entries = std::fs::read_dir(&folder.path).map_err(|e| format!("{}: {e}", folder.path))?;
+            paths.extend(entries.filter_map(Result::ok).map(|e| e.path()).filter(|p| p.is_file()).map(|p| p.to_string_lossy().into_owned()));
+        }
+        let preview = crate::operations::preview(Some(paths))?;
+        let result = tauri::async_runtime::block_on(crate::ai::classify_plan_and_move(&preview.id, "scheduled"));
+        let triage = match result { Ok(result) => result, Err(error) => { crate::operations::discard(&preview.id); return Err(error); } };
+        let failed = triage.moves.iter().filter(|r| !r.success).count();
+        let keeps: Vec<String> = preview.entries.iter().filter(|e| !e.warning && e.error.is_none() && e.action != "delete"
+            && triage.classifications.iter().any(|c| c.path == e.source && c.verdict == "keep"))
+            .map(|e| e.id.clone()).collect();
+        let kept = crate::operations::apply_scheduled(&preview.id, &keeps)?;
+        let total = kept.iter().filter(|r| r.success).count() + triage.moves.iter().filter(|r| r.success).count();
+        let _ = app_handle.emit("scheduled-clean-done", json!({ "organized": total }));
+        let failures = failed + kept.iter().filter(|r| !r.success).count();
+        if failures > 0 { return Err(format!("{failures} scheduled file operation(s) failed; check the files and review queue")); }
+        return Ok(());
+    }
     let mut total = 0usize;
     let run_id = crate::operations::new_run_id();
     for folder in folders {

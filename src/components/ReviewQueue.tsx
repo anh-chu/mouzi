@@ -25,6 +25,7 @@ export default function ReviewQueue({ paths }: { paths: string[] | null }) {
   const [aiError, setAiError] = useState('');
   const currentId = useRef<string | null>(null);
   const generation = useRef(0);
+  const autoMove = useRef(false);
   async function refresh() {
     const request = ++generation.current;
     setBusy(true); setError(''); setConfirm(false); setResults([]);
@@ -36,7 +37,8 @@ export default function ReviewQueue({ paths }: { paths: string[] | null }) {
       if (request !== generation.current) { await invoke('discard_preview_cmd', { id: plan.id }); return; }
       currentId.current = plan.id; setPreview(plan);
       setSelected(new Set());
-      const settings = await invoke<{ ai_enabled: boolean }>('get_settings_cmd');
+      const settings = await invoke<{ ai_enabled: boolean; ai_auto_move: boolean }>('get_settings_cmd');
+      autoMove.current = settings.ai_auto_move;
       if (request !== generation.current) return;
       if (settings.ai_enabled && plan.entries.some(e => !e.error)) await classify(plan, request);
       else setSelected(new Set(plan.entries.filter(e => !e.error && !e.warning && e.action !== 'delete').map(e => e.id)));
@@ -61,14 +63,24 @@ export default function ReviewQueue({ paths }: { paths: string[] | null }) {
     if (!plan.entries.length) return;
     setClassifying(true); setAiError(''); setVerdicts({}); setSelected(new Set());
     try {
-      const files = await invoke<Verdict[]>('classify_files_cmd', {
-        paths: plan.entries.filter(entry => !entry.error).map(entry => entry.source),
-      });
+      let files: Verdict[];
+      let moved = new Set<string>();
+      if (autoMove.current) {
+        const outcome = await invoke<{ classifications: Verdict[]; moves: OperationResult[] }>('auto_triage_preview_cmd', { id: plan.id });
+        files = outcome.classifications;
+        moved = new Set(outcome.moves.filter(result => result.success).map(result => result.source));
+        if (request === generation.current) {
+          setResults(outcome.moves);
+          setPreview(current => current ? { ...current, entries: current.entries.filter(e => !moved.has(e.source)) } : current);
+        }
+      } else {
+        files = await invoke<Verdict[]>('classify_files_cmd', { paths: plan.entries.filter(entry => !entry.error).map(entry => entry.source) });
+      }
       if (request !== generation.current) return;
       const next = Object.fromEntries(files.map(file => [file.path, file]));
       setVerdicts(next);
       // Trash and uncertain results require an explicit selection.
-      setSelected(new Set(plan.entries.filter(e => !e.error && !e.warning && e.action !== 'delete' && next[e.source]?.verdict === 'keep').map(e => e.id)));
+      setSelected(new Set(plan.entries.filter(e => !moved.has(e.source) && !e.error && !e.warning && e.action !== 'delete' && next[e.source]?.verdict === 'keep').map(e => e.id)));
     } catch (error) {
       if (request !== generation.current) return;
       const raw = String(error);
@@ -101,7 +113,7 @@ export default function ReviewQueue({ paths }: { paths: string[] | null }) {
         <button className={buttonClass} disabled={busy || classifying || confirm || !preview.entries.length} onClick={() => void classify(preview, generation.current)}>{classifying ? t('beta.aiClassifying') : t('beta.aiClassify')}</button>
         <span className="text-sm">{t('beta.selected', { count: selected.size })}</span>
       </div>
-      <p className="text-xs text-text-muted">{t('beta.aiReviewHelp')}</p>
+      <p className="text-xs text-text-muted">{t(autoMove.current ? 'beta.aiAutoReviewHelp' : 'beta.aiReviewHelp')}</p>
       {aiError && <p role="alert" className="text-sm text-red-700 dark:text-red-300">{aiError}</p>}
       {hasVerdicts && <div className="space-y-2">
         <p className="text-sm">{t('beta.aiSummary', { keep: keepCount, trash: trashCount, unsure: unsureCount })}</p>

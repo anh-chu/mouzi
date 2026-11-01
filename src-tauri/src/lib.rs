@@ -210,6 +210,7 @@ pub fn run() {
             apply_preview_cmd,
             discard_preview_cmd,
             classify_files_cmd,
+            auto_triage_preview_cmd,
             ai_key_status_cmd,
             save_ai_key_cmd,
             remove_ai_key_cmd,

@@ -122,7 +122,12 @@
       "aiKeySaved": "Key saved in Windows Credential Manager.",
       "aiKeyMissing": "No API key saved.",
       "aiKeySave": "Save key",
-      "aiKeyRemove": "Remove key"
+      "aiKeyRemove": "Remove key",
+      "aiAutoMove": "Automatically move Jev trash suggestions",
+      "aiAutoMoveHelp": "For Organize Now and scheduled runs, move Jev trash picks to this folder without confirmation. Unsure files stay put. Select a folder, save a key, and enable Jev first.",
+      "aiDeleteFolder": "Delete folder",
+      "aiNoFolder": "None selected",
+      "aiChooseFolder": "Choose folder"
     },
     "ignore": {
       "title": "Ignoruj",
@@ -282,6 +287,8 @@
     "aiHelp": "Sugestie Jev pochodzą z OpenRouter i mają charakter pomocniczy. Nic nie jest usuwane automatycznie.",
     "aiSelectTrash": "Select Jev trash suggestions",
     "aiTrashAction": "Jev suggestion",
-    "aiReviewHelp": "Jev suggestions are shown alongside rule actions. Trash and unsure suggestions start unchecked; select any trash suggestions you want to include."
+    "aiReviewHelp": "Jev suggestions are shown alongside rule actions. Trash and unsure suggestions start unchecked; select any trash suggestions you want to include.",
+    "aiAutoReviewHelp": "Jev trash picks are automatically moved to the chosen folder. Review remaining actions before applying.",
+    "aiAutoMoved": "Jev automatically moved {{count}} file(s) to your delete folder."
   }
 }

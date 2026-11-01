@@ -60,6 +60,8 @@ export interface AppSettings {
   auto_update_enabled: boolean;
   ai_enabled: boolean;
   ai_model: string;
+  ai_auto_move: boolean;
+  ai_delete_folder: string;
 }
 
 export const defaultSettings: AppSettings = {
@@ -73,6 +75,8 @@ export const defaultSettings: AppSettings = {
   auto_update_enabled: true,
   ai_enabled: false,
   ai_model: 'typesafe/jev-1.14',
+  ai_auto_move: false,
+  ai_delete_folder: '',
 };
 
 export interface ScheduleSettings {

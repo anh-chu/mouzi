@@ -144,6 +144,7 @@ export default function Settings() {
   const [aiKeySaved, setAiKeySaved] = useState(false);
   const [aiKeyError, setAiKeyError] = useState("");
   const [aiKeyBusy, setAiKeyBusy] = useState(false);
+  const [aiAutoError, setAiAutoError] = useState("");
   useEffect(() => {
     invoke<boolean>("ai_key_status_cmd").then(setAiKeySaved).catch(e => setAiKeyError(errorText(e)));
   }, []);
@@ -1030,6 +1031,26 @@ export default function Settings() {
                   }}>{t("settings.general.aiKeyRemove")}</button>
                 </div>
                 {aiKeyError && <p role="alert" className="text-sm text-red-500">{aiKeyError}</p>}
+                <div className="border-t border-border pt-3 space-y-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div><p className="text-sm font-medium">{t("settings.general.aiAutoMove")}</p>
+                      <p className="text-xs text-text-muted">{t("settings.general.aiAutoMoveHelp")}</p></div>
+                    <button type="button" role="switch" aria-label={t("settings.general.aiAutoMove")}
+                      aria-checked={settings?.ai_auto_move || false}
+                      disabled={!settings || (!settings.ai_auto_move && (!settings.ai_enabled || !settings.ai_delete_folder || !aiKeySaved))}
+                      onClick={async () => { if (!settings) return; setAiAutoError(""); try { await saveSettings({ ...settings, ai_auto_move: !settings.ai_auto_move }); } catch (e) { setAiAutoError(errorText(e)); } }}
+                      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${settings?.ai_auto_move ? "bg-primary" : "bg-surface-dark"}`}>
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings?.ai_auto_move ? "translate-x-6" : "translate-x-1"}`} />
+                    </button>
+                  </div>
+                  <p className="text-sm break-all">{t("settings.general.aiDeleteFolder")}: {settings?.ai_delete_folder || t("settings.general.aiNoFolder")}</p>
+                  <button type="button" className="rounded-md border border-border px-3 py-1 text-sm" onClick={async () => {
+                    if (!settings) return; setAiAutoError("");
+                    try { const folder = await open({ directory: true, multiple: false }); if (typeof folder === "string") await saveSettings({ ...settings, ai_delete_folder: folder }); }
+                    catch (e) { setAiAutoError(errorText(e)); }
+                  }}>{t("settings.general.aiChooseFolder")}</button>
+                  {aiAutoError && <p role="alert" className="text-sm text-red-500">{aiAutoError}</p>}
+                </div>
                 <label className="block text-sm">
                   {t("settings.general.aiModel")}
                   <input

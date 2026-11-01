@@ -43,6 +43,11 @@ pub async fn classify_files_cmd(
 }
 
 #[tauri::command]
+pub async fn auto_triage_preview_cmd(id: String) -> Result<crate::ai::AutomaticTriage, String> {
+    crate::ai::classify_plan_and_move(&id, "manual").await
+}
+
+#[tauri::command]
 pub fn history_cmd(filter: crate::operations::HistoryFilter) -> Result<Vec<ActionLog>, String> {
     crate::operations::history(&filter)
 }

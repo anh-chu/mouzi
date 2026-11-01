@@ -134,6 +134,8 @@ pub struct AppSettings {
     pub schedule_time_4: Option<String>,
     pub ai_enabled: bool,
     pub ai_model: String,
+    pub ai_auto_move: bool,
+    pub ai_delete_folder: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -276,6 +278,13 @@ pub fn init_db(app_dir: PathBuf) -> SqliteResult<()> {
             "ALTER TABLE settings ADD COLUMN ai_model TEXT NOT NULL DEFAULT 'typesafe/jev-1.14'",
             [],
         )?;
+    }
+
+    if !cols.iter().any(|c| c == "ai_auto_move") {
+        conn.execute("ALTER TABLE settings ADD COLUMN ai_auto_move INTEGER NOT NULL DEFAULT 0", [])?;
+    }
+    if !cols.iter().any(|c| c == "ai_delete_folder") {
+        conn.execute("ALTER TABLE settings ADD COLUMN ai_delete_folder TEXT NOT NULL DEFAULT ''", [])?;
     }
 
     let rule_cols: Vec<String> = conn
@@ -780,7 +789,7 @@ pub fn get_settings() -> SqliteResult<AppSettings> {
     let db = get_db();
     let conn = db.lock().unwrap();
     conn.query_row(
-        "SELECT id, language, theme, telemetry_enabled, first_run, autostart, grace_period_seconds, lock_check_enabled, auto_update_enabled, schedule_enabled, schedule_times_per_day, schedule_time_1, schedule_time_2, schedule_time_3, schedule_time_4, ai_enabled, ai_model FROM settings LIMIT 1",
+        "SELECT id, language, theme, telemetry_enabled, first_run, autostart, grace_period_seconds, lock_check_enabled, auto_update_enabled, schedule_enabled, schedule_times_per_day, schedule_time_1, schedule_time_2, schedule_time_3, schedule_time_4, ai_enabled, ai_model, ai_auto_move, ai_delete_folder FROM settings LIMIT 1",
         [],
         |row| {
             Ok(AppSettings {
@@ -803,6 +812,8 @@ pub fn get_settings() -> SqliteResult<AppSettings> {
                 ai_model: row
                     .get::<_, String>(16)
                     .unwrap_or_else(|_| "typesafe/jev-1.14".into()),
+                ai_auto_move: row.get::<_, i32>(17).unwrap_or(0) != 0,
+                ai_delete_folder: row.get(18).unwrap_or_default(),
             })
         },
     )
@@ -812,7 +823,7 @@ pub fn update_settings(settings: &AppSettings) -> SqliteResult<()> {
     let db = get_db();
     let conn = db.lock().unwrap();
     conn.execute(
-        "UPDATE settings SET language=?1, theme=?2, telemetry_enabled=?3, first_run=?4, autostart=?5, grace_period_seconds=?6, lock_check_enabled=?7, auto_update_enabled=?8, schedule_enabled=?9, schedule_times_per_day=?10, schedule_time_1=?11, schedule_time_2=?12, schedule_time_3=?13, schedule_time_4=?14, ai_enabled=?15, ai_model=?16 WHERE id=?17",
+        "UPDATE settings SET language=?1, theme=?2, telemetry_enabled=?3, first_run=?4, autostart=?5, grace_period_seconds=?6, lock_check_enabled=?7, auto_update_enabled=?8, schedule_enabled=?9, schedule_times_per_day=?10, schedule_time_1=?11, schedule_time_2=?12, schedule_time_3=?13, schedule_time_4=?14, ai_enabled=?15, ai_model=?16, ai_auto_move=?17, ai_delete_folder=?18 WHERE id=?19",
         params![
             settings.language,
             settings.theme,
@@ -830,6 +841,8 @@ pub fn update_settings(settings: &AppSettings) -> SqliteResult<()> {
             settings.schedule_time_4,
             settings.ai_enabled as i32,
             settings.ai_model,
+            settings.ai_auto_move as i32,
+            settings.ai_delete_folder,
             settings.id
         ],
     )?;

@@ -343,6 +343,7 @@ pub struct Preview {
     pub id: String,
     pub entries: Vec<PreviewEntry>,
 }
+#[derive(Clone)]
 struct Planned {
     entry: PreviewEntry,
     rule: Rule,
@@ -477,12 +478,96 @@ pub fn discard(id: &str) {
     PLANS.lock().unwrap().remove(id);
 }
 
+// Snapshot only entries captured by this preview, so classifications cannot move
+// arbitrary paths and a changed source is rejected before it is moved.
+pub fn planned_entries(id: &str) -> Result<Vec<PreviewEntry>, String> {
+    let plans = PLANS.lock().unwrap();
+    let plan = plans.get(id).ok_or("preview.expired")?;
+    if plan.created.elapsed() > Duration::from_secs(1800) { return Err("preview.expired".into()); }
+    Ok(plan.items.iter().map(|item| item.entry.clone()).collect())
+}
+
+pub fn auto_move_jev(id: &str, trash_paths: &[String], trigger: &str) -> Result<Vec<OperationResult>, String> {
+    let _guard = OPERATION_LOCK.lock().unwrap();
+    let settings = db::get_settings().map_err(|e| e.to_string())?;
+    if !settings.ai_enabled || !settings.ai_auto_move { return Err("Jev automatic moving is disabled".into()); }
+    let folder = fs::canonicalize(&settings.ai_delete_folder).map_err(|_| "Choose an existing delete folder in settings".to_string())?;
+    if !folder.is_dir() { return Err("Choose an existing delete folder in settings".into()); }
+    for watched in db::get_watched_folders().map_err(|e| e.to_string())? {
+        if fs::canonicalize(&watched.path).ok().as_ref() == Some(&folder) {
+            return Err("The delete folder cannot itself be a watched folder".into());
+        }
+    }
+    let items = {
+        let plans = PLANS.lock().unwrap();
+        let plan = plans.get(id).ok_or("preview.expired")?;
+        if plan.created.elapsed() > Duration::from_secs(1800) { return Err("preview.expired".into()); }
+        plan.items.clone()
+    };
+    let run_id = new_run_id();
+    let mut results = Vec::new();
+    for item in items.into_iter().filter(|i| trash_paths.contains(&i.entry.source)) {
+        let result = (|| -> Result<(), String> {
+            let current = db::get_settings().map_err(|e| e.to_string())?;
+            if !current.ai_enabled || !current.ai_auto_move || current.ai_delete_folder != settings.ai_delete_folder {
+                return Err("Jev automatic moving settings changed".into());
+            }
+            let path = Path::new(&item.entry.source);
+            if item.entry.warning || !watched_file(path) || db::is_baseline_file(path)
+                || rules::should_ignore_file(path) || rules::is_file_ignored_by_mouziignore(path)
+                || rules::is_file_locked(path) { return Err("preview.changed".into()); }
+            if trigger == "scheduled" && !db::get_watched_folders().map_err(|e| e.to_string())?.iter().any(|f|
+                f.enabled && db::is_folder_auto_mode(&f.mode) && path.parent().and_then(|p| fs::canonicalize(p).ok()) == fs::canonicalize(&f.path).ok()) {
+                return Err("preview.changed".into());
+            }
+            let file = rules::scan_file(path).ok_or("preview.changed")?;
+            let rule = rules::find_matching_rule(&file).ok_or("preview.changed")?;
+            if serde_json::to_string(&rule).ok() != serde_json::to_string(&item.rule).ok()
+                || fingerprint(path)? != item.fingerprint
+                || fs::metadata(path).and_then(|m| m.modified()).map_err(|e| e.to_string())? != item.modified {
+                return Err("preview.changed".into());
+            }
+            let name = path.file_name().ok_or("Missing file name")?;
+            let stem = path.file_stem().unwrap_or_default().to_string_lossy();
+            let ext = path.extension().map(|e| format!(".{}", e.to_string_lossy())).unwrap_or_default();
+            let mut moved_to = None;
+            for n in 0..10000 {
+                let target = if n == 0 { folder.join(name) } else { folder.join(format!("{stem} ({n}){ext}")) };
+                if target.exists() { continue; }
+                match move_without_overwrite(path, &target) {
+                    Ok(()) => { moved_to = Some(target); break; },
+                    Err(error) => return Err(error),
+                }
+            }
+            let target = moved_to.ok_or("Too many destination conflicts")?;
+            db::log_action(&ActionLog {
+                id: None, timestamp: Utc::now(), source_path: item.entry.source.clone(),
+                destination_path: Some(target.to_string_lossy().into()), action: "move".into(),
+                file_name: file.name, file_type: "AI triage".into(), undone: false,
+                run_id: Some(run_id.clone()), trigger: trigger.into(), file_extension: file.extension,
+                file_size: file.size, fingerprint: Some(item.fingerprint.clone()),
+            }).map_err(|e| format!("File moved but history could not be saved: {e}"))?;
+            Ok(())
+        })();
+        results.push(OperationResult { id: item.entry.id, source: item.entry.source, success: result.is_ok(), error: result.err() });
+    }
+    Ok(results)
+}
+
 #[cfg(test)]
 pub fn apply(id: &str, selected: &[String]) -> Result<Vec<OperationResult>, String> {
     apply_with_trash(id, selected, &[])
 }
 
 pub fn apply_with_trash(id: &str, selected: &[String], trash_ids: &[String]) -> Result<Vec<OperationResult>, String> {
+    apply_actions(id, selected, trash_ids, "approved")
+}
+
+pub fn apply_scheduled(id: &str, selected: &[String]) -> Result<Vec<OperationResult>, String> {
+    apply_actions(id, selected, &[], "scheduled")
+}
+
+fn apply_actions(id: &str, selected: &[String], trash_ids: &[String], trigger: &str) -> Result<Vec<OperationResult>, String> {
     let _guard = OPERATION_LOCK.lock().unwrap();
     let plan = PLANS.lock().unwrap().remove(id).ok_or("preview.expired")?;
     if plan.created.elapsed() > Duration::from_secs(1800) {
@@ -506,6 +591,10 @@ pub fn apply_with_trash(id: &str, selected: &[String], trash_ids: &[String]) -> 
             }
             if rules::is_file_locked(path) {
                 return Err("preview.locked".into());
+            }
+            if trigger == "scheduled" && !db::get_watched_folders().map_err(|e| e.to_string())?.iter().any(|f|
+                f.enabled && db::is_folder_auto_mode(&f.mode) && path.parent().and_then(|p| fs::canonicalize(p).ok()) == fs::canonicalize(&f.path).ok()) {
+                return Err("preview.changed".into());
             }
             let file = rules::scan_file(path).ok_or("preview.changed")?;
             let rule = rules::find_matching_rule(&file).ok_or("preview.changed")?;
@@ -534,7 +623,7 @@ pub fn apply_with_trash(id: &str, selected: &[String], trash_ids: &[String]) -> 
                 file_type: if ai_trash { "AI triage".into() } else { rule.name },
                 undone: false,
                 run_id: Some(run_id.clone()),
-                trigger: "approved".into(),
+                trigger: trigger.into(),
                 file_extension: file.extension,
                 file_size: file.size,
                 fingerprint: Some(item.fingerprint.clone()),
