@@ -279,6 +279,9 @@
     "aiNotConfigured": "在设置中添加 OpenRouter API 密钥以使用 Jev 分类。",
     "aiDisabled": "请先在设置中启用 Jev 分类。",
     "aiFailed": "Jev 分类失败：{{error}}",
-    "aiHelp": "Jev 的建议来自 OpenRouter，仅供参考。不会自动删除任何内容。"
+    "aiHelp": "Jev 的建议来自 OpenRouter，仅供参考。不会自动删除任何内容。",
+    "aiSelectTrash": "Select Jev trash suggestions",
+    "aiTrashAction": "Jev suggestion",
+    "aiReviewHelp": "Jev suggestions are shown alongside rule actions. Trash and unsure suggestions start unchecked; select any trash suggestions you want to include."
   }
 }

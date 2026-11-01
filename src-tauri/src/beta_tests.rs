@@ -159,6 +159,44 @@ fn preview_selective_apply_changed_files_rules_and_conflicts() {
 }
 
 #[test]
+fn combined_review_rejects_changed_trash_and_keeps_unselected_files() {
+    let f = Fixture::new();
+    db::add_rule(&f.rule()).unwrap();
+    let changed = f.write("changed.txt", "original");
+    let untouched = f.write("untouched.txt", "leave alone");
+    let p = op::preview(None).unwrap();
+    let changed_id = p.entries.iter().find(|e| e.source == changed.to_string_lossy().as_ref()).unwrap().id.clone();
+    let untouched_id = p.entries.iter().find(|e| e.source == untouched.to_string_lossy().as_ref()).unwrap().id.clone();
+    fs::write(&changed, "changed since review").unwrap();
+    let results = op::apply_with_trash(&p.id, &[changed_id.clone()], &[changed_id, untouched_id]).unwrap();
+    assert_eq!(results.len(), 1);
+    assert!(!results[0].success);
+    assert!(changed.exists());
+    assert!(untouched.exists());
+}
+
+#[cfg(target_os = "windows")]
+#[test]
+fn combined_review_applies_move_and_trash_in_one_run() {
+    let f = Fixture::new();
+    db::add_rule(&f.rule()).unwrap();
+    let moved = f.write("move.txt", "keep");
+    let trashed = f.write("trash.txt", "discard");
+    let p = op::preview(None).unwrap();
+    let moved_id = p.entries.iter().find(|e| e.source == moved.to_string_lossy().as_ref()).unwrap().id.clone();
+    let trash_id = p.entries.iter().find(|e| e.source == trashed.to_string_lossy().as_ref()).unwrap().id.clone();
+    let results = op::apply_with_trash(&p.id, &[moved_id, trash_id.clone()], &[trash_id]).unwrap();
+    assert_eq!(results.len(), 2);
+    assert!(results.iter().all(|r| r.success));
+    assert!(f.root.join("Sorted/move.txt").exists());
+    assert!(!trashed.exists());
+    let logs = db::get_recent_logs(-1).unwrap();
+    assert_eq!(logs.len(), 2);
+    assert_eq!(logs[0].run_id, logs[1].run_id);
+    assert!(logs.iter().any(|l| l.file_name == "trash.txt" && l.action == "delete" && l.destination_path.is_none()));
+}
+
+#[test]
 fn runs_filters_safe_partial_undo_and_no_automatic_redo() {
     let f = Fixture::new();
     db::add_rule(&f.rule()).unwrap();

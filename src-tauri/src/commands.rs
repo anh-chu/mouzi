@@ -20,8 +20,9 @@ pub async fn preview_cmd(paths: Option<Vec<String>>) -> Result<crate::operations
 pub async fn apply_preview_cmd(
     id: String,
     selected: Vec<String>,
+    trash_ids: Option<Vec<String>>,
 ) -> Result<Vec<crate::operations::OperationResult>, String> {
-    tauri::async_runtime::spawn_blocking(move || crate::operations::apply(&id, &selected))
+    tauri::async_runtime::spawn_blocking(move || crate::operations::apply_with_trash(&id, &selected, &trash_ids.unwrap_or_default()))
         .await
         .map_err(|e| e.to_string())?
 }
@@ -39,15 +40,6 @@ pub async fn classify_files_cmd(
         .await
         .map_err(|e| e.to_string())?;
     crate::ai::classify(files).await
-}
-
-#[tauri::command]
-pub async fn trash_files_cmd(
-    paths: Vec<String>,
-) -> Result<Vec<crate::operations::OperationResult>, String> {
-    tauri::async_runtime::spawn_blocking(move || crate::operations::trash_selected(paths))
-        .await
-        .map_err(|e| e.to_string())?
 }
 
 #[tauri::command]

@@ -285,6 +285,9 @@
     "aiNotConfigured": "Thêm khóa API OpenRouter trong Cài đặt để dùng phân loại Jev.",
     "aiDisabled": "Hãy bật phân loại Jev trong Cài đặt trước.",
     "aiFailed": "Phân loại Jev thất bại: {{error}}",
-    "aiHelp": "Gợi ý của Jev đến từ OpenRouter và chỉ mang tính tham khảo. Không có gì bị xóa tự động."
+    "aiHelp": "Gợi ý của Jev đến từ OpenRouter và chỉ mang tính tham khảo. Không có gì bị xóa tự động.",
+    "aiSelectTrash": "Select Jev trash suggestions",
+    "aiTrashAction": "Jev suggestion",
+    "aiReviewHelp": "Jev suggestions are shown alongside rule actions. Trash and unsure suggestions start unchecked; select any trash suggestions you want to include."
   }
 }

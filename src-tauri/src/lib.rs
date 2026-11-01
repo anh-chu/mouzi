@@ -213,7 +213,6 @@ pub fn run() {
             ai_key_status_cmd,
             save_ai_key_cmd,
             remove_ai_key_cmd,
-            trash_files_cmd,
             history_cmd,
             undo_selected_cmd,
             set_only_new_cmd,

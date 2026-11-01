@@ -279,6 +279,9 @@
     "aiNotConfigured": "Ajoutez une clé API OpenRouter dans les Réglages pour utiliser le tri Jev.",
     "aiDisabled": "Activez d'abord le tri Jev dans les Réglages.",
     "aiFailed": "Échec du tri Jev : {{error}}",
-    "aiHelp": "Les suggestions de Jev proviennent d'OpenRouter et sont indicatives. Rien n'est supprimé automatiquement."
+    "aiHelp": "Les suggestions de Jev proviennent d'OpenRouter et sont indicatives. Rien n'est supprimé automatiquement.",
+    "aiSelectTrash": "Select Jev trash suggestions",
+    "aiTrashAction": "Jev suggestion",
+    "aiReviewHelp": "Jev suggestions are shown alongside rule actions. Trash and unsure suggestions start unchecked; select any trash suggestions you want to include."
   }
 }

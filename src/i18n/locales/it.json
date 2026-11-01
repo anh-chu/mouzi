@@ -279,6 +279,9 @@
     "aiNotConfigured": "Aggiungi una chiave API OpenRouter nelle Impostazioni per usare la classificazione Jev.",
     "aiDisabled": "Abilita prima la classificazione Jev nelle Impostazioni.",
     "aiFailed": "Classificazione Jev non riuscita: {{error}}",
-    "aiHelp": "I suggerimenti di Jev provengono da OpenRouter e sono indicativi. Nulla viene eliminato automaticamente."
+    "aiHelp": "I suggerimenti di Jev provengono da OpenRouter e sono indicativi. Nulla viene eliminato automaticamente.",
+    "aiSelectTrash": "Select Jev trash suggestions",
+    "aiTrashAction": "Jev suggestion",
+    "aiReviewHelp": "Jev suggestions are shown alongside rule actions. Trash and unsure suggestions start unchecked; select any trash suggestions you want to include."
   }
 }

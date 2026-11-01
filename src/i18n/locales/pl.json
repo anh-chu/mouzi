@@ -279,6 +279,9 @@
     "aiNotConfigured": "Dodaj klucz API OpenRouter w Ustawieniach, aby użyć triagingu Jev.",
     "aiDisabled": "Najpierw włącz triaging Jev w Ustawieniach.",
     "aiFailed": "Triaging Jev nie powiódł się: {{error}}",
-    "aiHelp": "Sugestie Jev pochodzą z OpenRouter i mają charakter pomocniczy. Nic nie jest usuwane automatycznie."
+    "aiHelp": "Sugestie Jev pochodzą z OpenRouter i mają charakter pomocniczy. Nic nie jest usuwane automatycznie.",
+    "aiSelectTrash": "Select Jev trash suggestions",
+    "aiTrashAction": "Jev suggestion",
+    "aiReviewHelp": "Jev suggestions are shown alongside rule actions. Trash and unsure suggestions start unchecked; select any trash suggestions you want to include."
   }
 }

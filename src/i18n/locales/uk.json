@@ -279,6 +279,9 @@
     "aiNotConfigured": "Додайте ключ API OpenRouter у налаштуваннях, щоб використовувати сортування Jev.",
     "aiDisabled": "Спочатку увімкніть сортування Jev у налаштуваннях.",
     "aiFailed": "Сортування Jev не вдалося: {{error}}",
-    "aiHelp": "Пропозиції Jev надходять від OpenRouter і мають рекомендаційний характер. Нічого не видаляється автоматично."
+    "aiHelp": "Пропозиції Jev надходять від OpenRouter і мають рекомендаційний характер. Нічого не видаляється автоматично.",
+    "aiSelectTrash": "Select Jev trash suggestions",
+    "aiTrashAction": "Jev suggestion",
+    "aiReviewHelp": "Jev suggestions are shown alongside rule actions. Trash and unsure suggestions start unchecked; select any trash suggestions you want to include."
   }
 }
