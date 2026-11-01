@@ -23,6 +23,11 @@ jobs:
         run: cargo test --locked --manifest-path src-tauri/Cargo.toml --lib
       - name: Build unsigned desktop app and installer
         run: npm run tauri build -- --ci --bundles nsis --config src-tauri/tauri.jev.conf.json
+      - name: Exercise review window
+        shell: pwsh
+        run: |
+          npm install --no-save --package-lock=false playwright
+          node tests/jev-review-smoke.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: mouzi-jev-windows
