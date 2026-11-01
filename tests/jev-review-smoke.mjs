@@ -22,7 +22,7 @@ try {
   await page.getByRole('button', { name: 'Watched Folders' }).waitFor({timeout: 30000});
   // Close the initial settings window, then exercise the actual popup command
   // that must create a fresh webview. Creating it synchronously deadlocks on Windows.
-  await page.evaluate(() => window.__TAURI_INTERNALS__.invoke('show_popup_cmd'));
+  await Promise.race([page.evaluate(() => window.__TAURI_INTERNALS__.invoke('show_popup_cmd')), new Promise((_, reject) => setTimeout(() => reject(Error('Popup creation command did not return')), 30000))]);
   let popup;
   await until(async () => { popup = browser.contexts().flatMap(c => c.pages()).find(p => p.url().includes('popup')); return !!popup; }, 30000);
   await popup.getByRole('button', {name:'Organize Now', exact:true}).waitFor({timeout:30000});
