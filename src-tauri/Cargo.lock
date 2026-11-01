@@ -2288,6 +2288,7 @@ dependencies = [
  "notify",
  "once_cell",
  "regex",
+ "reqwest",
  "rusqlite",
  "serde",
  "serde_json",

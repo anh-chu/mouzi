@@ -1,0 +1,6 @@
+﻿{
+  "productName": "Mouzi Jev",
+  "identifier": "cc.mouzi.jev",
+  "bundle": { "createUpdaterArtifacts": false },
+  "plugins": { "updater": { "endpoints": ["https://github.com/anh-chu/mouzi/releases/latest/download/latest.json"] } }
+}

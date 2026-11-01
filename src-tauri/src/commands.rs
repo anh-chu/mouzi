@@ -32,6 +32,25 @@ pub fn discard_preview_cmd(id: String) {
 }
 
 #[tauri::command]
+pub async fn classify_files_cmd(
+    paths: Vec<String>,
+) -> Result<Vec<crate::ai::Classification>, String> {
+    let files = tauri::async_runtime::spawn_blocking(move || crate::ai::describe_paths(paths))
+        .await
+        .map_err(|e| e.to_string())?;
+    crate::ai::classify(files).await
+}
+
+#[tauri::command]
+pub async fn trash_files_cmd(
+    paths: Vec<String>,
+) -> Result<Vec<crate::operations::OperationResult>, String> {
+    tauri::async_runtime::spawn_blocking(move || crate::operations::trash_selected(paths))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
 pub fn history_cmd(filter: crate::operations::HistoryFilter) -> Result<Vec<ActionLog>, String> {
     crate::operations::history(&filter)
 }
@@ -559,4 +578,24 @@ pub fn import_rules_cmd(path: String, replace: bool) -> Result<usize, String> {
     let rules: Vec<Rule> = serde_json::from_str(&data).map_err(|e| e.to_string())?;
     let _guard = crate::operations::OPERATION_LOCK.lock().unwrap();
     import_rules(&rules, replace)
+}
+
+#[tauri::command]
+pub fn ai_key_status_cmd() -> Result<bool, String> {
+    crate::credentials::migrate_legacy()?;
+    Ok(crate::credentials::load()?.is_some())
+}
+
+#[tauri::command]
+pub fn save_ai_key_cmd(key: String) -> Result<(), String> {
+    let key = key.trim();
+    if key.is_empty() { return Err("API key cannot be empty".into()); }
+    crate::credentials::save(key)?;
+    crate::credentials::clear_legacy()
+}
+
+#[tauri::command]
+pub fn remove_ai_key_cmd() -> Result<(), String> {
+    crate::credentials::remove()?;
+    crate::credentials::clear_legacy()
 }

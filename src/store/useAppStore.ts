@@ -58,6 +58,8 @@ export interface AppSettings {
   grace_period_seconds: number;
   lock_check_enabled: boolean;
   auto_update_enabled: boolean;
+  ai_enabled: boolean;
+  ai_model: string;
 }
 
 export const defaultSettings: AppSettings = {
@@ -69,6 +71,8 @@ export const defaultSettings: AppSettings = {
   grace_period_seconds: 300,
   lock_check_enabled: true,
   auto_update_enabled: true,
+  ai_enabled: false,
+  ai_model: 'typesafe/jev-1.14',
 };
 
 export interface ScheduleSettings {

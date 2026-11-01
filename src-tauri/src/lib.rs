@@ -1,7 +1,9 @@
 pub mod archive;
 #[cfg(test)]
 mod beta_tests;
+pub mod ai;
 pub mod commands;
+pub mod credentials;
 pub mod db;
 pub mod i18n;
 pub mod ignore;
@@ -104,7 +106,7 @@ pub fn run() {
             // Initialize database
             let beta = env!("CARGO_PKG_VERSION").contains("beta");
             if let Some(proj_dirs) =
-                ProjectDirs::from("cc", "mouzi", if beta { "mouzi-beta" } else { "mouzi" })
+                ProjectDirs::from("cc", "mouzi", if beta { "mouzi-jev-beta" } else { "mouzi-jev" })
             {
                 let data_dir = proj_dirs.data_dir().to_path_buf();
                 std::fs::create_dir_all(&data_dir).ok();
@@ -207,6 +209,11 @@ pub fn run() {
             preview_cmd,
             apply_preview_cmd,
             discard_preview_cmd,
+            classify_files_cmd,
+            ai_key_status_cmd,
+            save_ai_key_cmd,
+            remove_ai_key_cmd,
+            trash_files_cmd,
             history_cmd,
             undo_selected_cmd,
             set_only_new_cmd,

@@ -111,7 +111,18 @@
       "gracePeriodCustom": "Personalizzato",
       "gracePeriodMaxError": "Il periodo di grazia non può superare 7 giorni",
       "autoUpdates": "Controllo automatico aggiornamenti",
-      "autoUpdatesDesc": "Cerca nuove versioni di Mouzi e consente di installarle con un clic."
+      "autoUpdatesDesc": "Cerca nuove versioni di Mouzi e consente di installarle con un clic.",
+      "aiTitle": "Classificazione file con IA",
+      "aiEnable": "Abilita la classificazione Jev tramite OpenRouter",
+      "aiDesc": "Invia nomi, dimensioni e regole corrispondenti a OpenRouter per suggerire Mantieni o Cestino. Il contenuto dei file non viene mai caricato.",
+      "aiApiKey": "Chiave API OpenRouter",
+      "aiApiKeyPlaceholder": "sk-or-v1-...",
+      "aiModel": "Modello",
+      "aiModelHelp": "Predefinito: typesafe/jev-1.14. La chiave e il modello sono salvati localmente.",
+      "aiKeySaved": "Key saved in Windows Credential Manager.",
+      "aiKeyMissing": "No API key saved.",
+      "aiKeySave": "Save key",
+      "aiKeyRemove": "Remove key"
     },
     "ignore": {
       "title": "Ignora",
@@ -255,6 +266,19 @@
       "history.conflict": "Esiste già un file nel percorso originale. Nulla è stato sovrascritto.",
       "history.changed": "Il file organizzato è cambiato dopo l'operazione. Non è stato spostato.",
       "history.unverified": "Questa vecchia operazione non ha dati di verifica. Ripristina il file manualmente."
-    }
+    },
+    "aiClassify": "Classifica con Jev",
+    "aiClassifying": "Interrogazione di Jev…",
+    "aiKeep": "Mantieni",
+    "aiTrash": "Cestino",
+    "aiUnsure": "Incerto",
+    "aiSelectKeep": "Seleziona quelli da mantenere",
+    "aiTrashPicks": "Sposta {{count}} suggerimenti nel Cestino",
+    "aiTrashConfirm": "Spostare {{count}} file nel Cestino di sistema? Potrai ripristinarli dal Cestino in seguito.",
+    "aiSummary": "Jev consiglia di mantenere {{keep}} e spostare {{trash}} nel cestino ({{unsure}} incerti).",
+    "aiNotConfigured": "Aggiungi una chiave API OpenRouter nelle Impostazioni per usare la classificazione Jev.",
+    "aiDisabled": "Abilita prima la classificazione Jev nelle Impostazioni.",
+    "aiFailed": "Classificazione Jev non riuscita: {{error}}",
+    "aiHelp": "I suggerimenti di Jev provengono da OpenRouter e sono indicativi. Nulla viene eliminato automaticamente."
   }
 }

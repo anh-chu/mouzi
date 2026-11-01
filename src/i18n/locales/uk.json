@@ -111,7 +111,18 @@
       "gracePeriodCustom": "Власний",
       "gracePeriodMaxError": "Період очікування не може перевищувати 7 днів",
       "autoUpdates": "Автоматична перевірка оновлень",
-      "autoUpdatesDesc": "Перевіряти нові версії Mouzi й пропонувати встановлення одним натисканням."
+      "autoUpdatesDesc": "Перевіряти нові версії Mouzi й пропонувати встановлення одним натисканням.",
+      "aiTitle": "ІІ-сортування файлів",
+      "aiEnable": "Увімкнути сортування Jev через OpenRouter",
+      "aiDesc": "Надсилає імена, розміри та відповідні правила до OpenRouter для пропозиції «Залишити» або «До кошика». Вміст файлів ніколи не завантажується.",
+      "aiApiKey": "Ключ API OpenRouter",
+      "aiApiKeyPlaceholder": "sk-or-v1-...",
+      "aiModel": "Модель",
+      "aiModelHelp": "Типово: typesafe/jev-1.14. Ключ і модель зберігаються локально.",
+      "aiKeySaved": "Key saved in Windows Credential Manager.",
+      "aiKeyMissing": "No API key saved.",
+      "aiKeySave": "Save key",
+      "aiKeyRemove": "Remove key"
     },
     "ignore": {
       "title": "Винятки",
@@ -255,6 +266,19 @@
       "history.conflict": "За початковим шляхом уже є файл. Нічого не перезаписано.",
       "history.changed": "Упорядкований файл змінився після операції. Його не було переміщено.",
       "history.unverified": "Для цієї старої операції немає даних перевірки. Відновіть файл вручну."
-    }
+    },
+    "aiClassify": "Категоризувати з Jev",
+    "aiClassifying": "Запит до Jev…",
+    "aiKeep": "Залишити",
+    "aiTrash": "Кошик",
+    "aiUnsure": "Невпевнено",
+    "aiSelectKeep": "Вибрати для збереження",
+    "aiTrashPicks": "Перемістити {{count}} кандидатів до Кошика",
+    "aiTrashConfirm": "Перемістити {{count}} файл(ів) до системного кошика? Пізніше їх можна відновити з Кошика.",
+    "aiSummary": "Jev пропонує залишити {{keep}} і перемістити до кошика {{trash}} ({{unsure}} невпевнених).",
+    "aiNotConfigured": "Додайте ключ API OpenRouter у налаштуваннях, щоб використовувати сортування Jev.",
+    "aiDisabled": "Спочатку увімкніть сортування Jev у налаштуваннях.",
+    "aiFailed": "Сортування Jev не вдалося: {{error}}",
+    "aiHelp": "Пропозиції Jev надходять від OpenRouter і мають рекомендаційний характер. Нічого не видаляється автоматично."
   }
 }

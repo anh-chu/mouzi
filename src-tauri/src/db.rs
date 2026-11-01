@@ -132,6 +132,8 @@ pub struct AppSettings {
     pub schedule_time_2: Option<String>,
     pub schedule_time_3: Option<String>,
     pub schedule_time_4: Option<String>,
+    pub ai_enabled: bool,
+    pub ai_model: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -256,6 +258,24 @@ pub fn init_db(app_dir: PathBuf) -> SqliteResult<()> {
     }
     if !cols.iter().any(|c| c == "schedule_time_4") {
         conn.execute("ALTER TABLE settings ADD COLUMN schedule_time_4 TEXT", [])?;
+    }
+    if !cols.iter().any(|c| c == "ai_enabled") {
+        conn.execute(
+            "ALTER TABLE settings ADD COLUMN ai_enabled INTEGER NOT NULL DEFAULT 0",
+            [],
+        )?;
+    }
+    if !cols.iter().any(|c| c == "ai_api_key") {
+        conn.execute(
+            "ALTER TABLE settings ADD COLUMN ai_api_key TEXT NOT NULL DEFAULT ''",
+            [],
+        )?;
+    }
+    if !cols.iter().any(|c| c == "ai_model") {
+        conn.execute(
+            "ALTER TABLE settings ADD COLUMN ai_model TEXT NOT NULL DEFAULT 'typesafe/jev-1.14'",
+            [],
+        )?;
     }
 
     let rule_cols: Vec<String> = conn
@@ -760,7 +780,7 @@ pub fn get_settings() -> SqliteResult<AppSettings> {
     let db = get_db();
     let conn = db.lock().unwrap();
     conn.query_row(
-        "SELECT id, language, theme, telemetry_enabled, first_run, autostart, grace_period_seconds, lock_check_enabled, auto_update_enabled, schedule_enabled, schedule_times_per_day, schedule_time_1, schedule_time_2, schedule_time_3, schedule_time_4 FROM settings LIMIT 1",
+        "SELECT id, language, theme, telemetry_enabled, first_run, autostart, grace_period_seconds, lock_check_enabled, auto_update_enabled, schedule_enabled, schedule_times_per_day, schedule_time_1, schedule_time_2, schedule_time_3, schedule_time_4, ai_enabled, ai_model FROM settings LIMIT 1",
         [],
         |row| {
             Ok(AppSettings {
@@ -779,6 +799,10 @@ pub fn get_settings() -> SqliteResult<AppSettings> {
                 schedule_time_2: row.get(12).ok(),
                 schedule_time_3: row.get(13).ok(),
                 schedule_time_4: row.get(14).ok(),
+                ai_enabled: row.get::<_, i32>(15).unwrap_or(0) != 0,
+                ai_model: row
+                    .get::<_, String>(16)
+                    .unwrap_or_else(|_| "typesafe/jev-1.14".into()),
             })
         },
     )
@@ -788,7 +812,7 @@ pub fn update_settings(settings: &AppSettings) -> SqliteResult<()> {
     let db = get_db();
     let conn = db.lock().unwrap();
     conn.execute(
-        "UPDATE settings SET language=?1, theme=?2, telemetry_enabled=?3, first_run=?4, autostart=?5, grace_period_seconds=?6, lock_check_enabled=?7, auto_update_enabled=?8, schedule_enabled=?9, schedule_times_per_day=?10, schedule_time_1=?11, schedule_time_2=?12, schedule_time_3=?13, schedule_time_4=?14 WHERE id=?15",
+        "UPDATE settings SET language=?1, theme=?2, telemetry_enabled=?3, first_run=?4, autostart=?5, grace_period_seconds=?6, lock_check_enabled=?7, auto_update_enabled=?8, schedule_enabled=?9, schedule_times_per_day=?10, schedule_time_1=?11, schedule_time_2=?12, schedule_time_3=?13, schedule_time_4=?14, ai_enabled=?15, ai_model=?16 WHERE id=?17",
         params![
             settings.language,
             settings.theme,
@@ -804,6 +828,8 @@ pub fn update_settings(settings: &AppSettings) -> SqliteResult<()> {
             settings.schedule_time_2,
             settings.schedule_time_3,
             settings.schedule_time_4,
+            settings.ai_enabled as i32,
+            settings.ai_model,
             settings.id
         ],
     )?;

@@ -111,7 +111,18 @@
       "gracePeriodCustom": "カスタム",
       "gracePeriodMaxError": "猶予期間は7日を超えることはできません",
       "autoUpdates": "更新を自動確認",
-      "autoUpdatesDesc": "Mouzi の新しいバージョンを確認し、ワンクリックでインストールできます。"
+      "autoUpdatesDesc": "Mouzi の新しいバージョンを確認し、ワンクリックでインストールできます。",
+      "aiTitle": "AI によるファイル分類",
+      "aiEnable": "OpenRouter 経由で Jev 分類を有効にする",
+      "aiDesc": "ファイル名、サイズ、一致したルールを OpenRouter に送り、保持またはゴミ箱を提案します。ファイルの内容はアップロードされません。",
+      "aiApiKey": "OpenRouter API キー",
+      "aiApiKeyPlaceholder": "sk-or-v1-...",
+      "aiModel": "モデル",
+      "aiModelHelp": "既定: typesafe/jev-1.14。キーとモデルはローカルに保存されます。",
+      "aiKeySaved": "Key saved in Windows Credential Manager.",
+      "aiKeyMissing": "No API key saved.",
+      "aiKeySave": "Save key",
+      "aiKeyRemove": "Remove key"
     },
     "ignore": {
       "title": "除外",
@@ -255,6 +266,19 @@
       "history.conflict": "元のパスにはすでにファイルがあります。上書きは行っていません。",
       "history.changed": "整理後にファイルが変更されています。移動は行っていません。",
       "history.unverified": "この古い操作には検証データがありません。手動でファイルを復元してください。"
-    }
+    },
+    "aiClassify": "Jev で分類",
+    "aiClassifying": "Jev に問い合わせ中…",
+    "aiKeep": "保持",
+    "aiTrash": "ゴミ箱",
+    "aiUnsure": "不明",
+    "aiSelectKeep": "保持するものを選択",
+    "aiTrashPicks": "ゴミ箱候補 {{count}} 件をゴミ箱へ移動",
+    "aiTrashConfirm": "{{count}} 件のファイルをシステムのゴミ箱へ移動しますか？後でゴミ箱から復元できます。",
+    "aiSummary": "Jev は {{keep}} 件を保持し、{{trash}} 件をゴミ箱へ移動することを提案しています（{{unsure}} 件は不明）。",
+    "aiNotConfigured": "設定で OpenRouter API キーを追加すると Jev 分類を使用できます。",
+    "aiDisabled": "先に設定で Jev 分類を有効にしてください。",
+    "aiFailed": "Jev 分類に失敗しました: {{error}}",
+    "aiHelp": "Jev の提案は OpenRouter による参考情報です。自動的に削除されることはありません。"
   }
 }

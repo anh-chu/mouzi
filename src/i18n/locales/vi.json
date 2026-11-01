@@ -117,7 +117,18 @@
       "gracePeriodCustom": "Tùy chỉnh",
       "gracePeriodMaxError": "Thời gian chờ không được quá 7 ngày",
       "autoUpdates": "Tự động kiểm tra cập nhật",
-      "autoUpdatesDesc": "Kiểm tra phiên bản Mouzi mới và cho phép cài đặt bằng một cú nhấp."
+      "autoUpdatesDesc": "Kiểm tra phiên bản Mouzi mới và cho phép cài đặt bằng một cú nhấp.",
+      "aiTitle": "Phân loại tệp bằng AI",
+      "aiEnable": "Bật phân loại Jev qua OpenRouter",
+      "aiDesc": "Gửi tên, kích thước và quy tắc khớp đến OpenRouter để đề xuất Giữ hoặc Thùng rác. Nội dung tệp không bao giờ được tải lên.",
+      "aiApiKey": "Khóa API OpenRouter",
+      "aiApiKeyPlaceholder": "sk-or-v1-...",
+      "aiModel": "Mô hình",
+      "aiModelHelp": "Mặc định: typesafe/jev-1.14. Khóa và mô hình được lưu cục bộ.",
+      "aiKeySaved": "Key saved in Windows Credential Manager.",
+      "aiKeyMissing": "No API key saved.",
+      "aiKeySave": "Save key",
+      "aiKeyRemove": "Remove key"
     },
     "ignore": {
       "title": "Bỏ qua",
@@ -261,6 +272,19 @@
       "history.conflict": "Đã có tệp ở đường dẫn ban đầu. Không có gì bị ghi đè.",
       "history.changed": "Tệp đã thay đổi kể từ khi sắp xếp. Tệp không được di chuyển.",
       "history.unverified": "Thao tác cũ này không có dữ liệu xác minh. Hãy khôi phục tệp thủ công."
-    }
+    },
+    "aiClassify": "Phân loại với Jev",
+    "aiClassifying": "Đang hỏi Jev…",
+    "aiKeep": "Giữ",
+    "aiTrash": "Thùng rác",
+    "aiUnsure": "Không chắc",
+    "aiSelectKeep": "Chọn các tệp nên giữ",
+    "aiTrashPicks": "Chuyển {{count}} gợi ý rác vào Thùng rác",
+    "aiTrashConfirm": "Chuyển {{count}} tệp vào Thùng rác hệ thống? Bạn có thể khôi phục từ Thùng rác sau.",
+    "aiSummary": "Jev đề xuất giữ {{keep}} và chuyển {{trash}} vào thùng rác ({{unsure}} không chắc).",
+    "aiNotConfigured": "Thêm khóa API OpenRouter trong Cài đặt để dùng phân loại Jev.",
+    "aiDisabled": "Hãy bật phân loại Jev trong Cài đặt trước.",
+    "aiFailed": "Phân loại Jev thất bại: {{error}}",
+    "aiHelp": "Gợi ý của Jev đến từ OpenRouter và chỉ mang tính tham khảo. Không có gì bị xóa tự động."
   }
 }

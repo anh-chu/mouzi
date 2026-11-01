@@ -101,7 +101,18 @@
       "gracePeriodCustom": "Personalizado",
       "gracePeriodMaxError": "El período de gracia no puede exceder los 7 días",
       "autoUpdates": "Comprobar actualizaciones automáticamente",
-      "autoUpdatesDesc": "Busca nuevas versiones de Mouzi y ofrece instalarlas con un clic."
+      "autoUpdatesDesc": "Busca nuevas versiones de Mouzi y ofrece instalarlas con un clic.",
+      "aiTitle": "Clasificación de archivos con IA",
+      "aiEnable": "Activar la clasificación de Jev mediante OpenRouter",
+      "aiDesc": "Envía nombres, tamaños y reglas coincidentes a OpenRouter para sugerir Conservar o Papelera. El contenido de los archivos nunca se sube.",
+      "aiApiKey": "Clave de API de OpenRouter",
+      "aiApiKeyPlaceholder": "sk-or-v1-...",
+      "aiModel": "Modelo",
+      "aiModelHelp": "Predeterminado: typesafe/jev-1.14. La clave y el modelo se guardan localmente.",
+      "aiKeySaved": "Key saved in Windows Credential Manager.",
+      "aiKeyMissing": "No API key saved.",
+      "aiKeySave": "Save key",
+      "aiKeyRemove": "Remove key"
     },
     "ignore": {
       "title": "Excluir",
@@ -255,6 +266,19 @@
       "history.conflict": "Ya existe un archivo en la ruta original. No se ha sobrescrito nada.",
       "history.changed": "El archivo organizado ha cambiado desde la operación. No se ha movido.",
       "history.unverified": "Esta operación antigua no tiene datos de verificación. Restaura el archivo manualmente."
-    }
+    },
+    "aiClassify": "Categorizar con Jev",
+    "aiClassifying": "Consultando a Jev…",
+    "aiKeep": "Conservar",
+    "aiTrash": "Papelera",
+    "aiUnsure": "Inseguro",
+    "aiSelectKeep": "Seleccionar los de conservar",
+    "aiTrashPicks": "Mover {{count}} sugerencias de papelera a la Papelera",
+    "aiTrashConfirm": "¿Mover {{count}} archivo(s) a la Papelera del sistema? Puede restaurarlos desde la Papelera más tarde.",
+    "aiSummary": "Jev sugiere conservar {{keep}} y mover {{trash}} a la papelera ({{unsure}} inseguros).",
+    "aiNotConfigured": "Añada una clave de API de OpenRouter en Ajustes para usar la clasificación de Jev.",
+    "aiDisabled": "Active primero la clasificación de Jev en Ajustes.",
+    "aiFailed": "La clasificación de Jev falló: {{error}}",
+    "aiHelp": "Las sugerencias de Jev provienen de OpenRouter y son orientativas. Nada se elimina automáticamente."
   }
 }

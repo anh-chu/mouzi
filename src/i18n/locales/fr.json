@@ -111,7 +111,18 @@
       "gracePeriodCustom": "Personnalisé",
       "gracePeriodMaxError": "La période de grâce ne peut pas dépasser 7 jours",
       "autoUpdates": "Recherche automatique des mises à jour",
-      "autoUpdatesDesc": "Rechercher les nouvelles versions de Mouzi et proposer leur installation en un clic."
+      "autoUpdatesDesc": "Rechercher les nouvelles versions de Mouzi et proposer leur installation en un clic.",
+      "aiTitle": "Tri des fichiers par IA",
+      "aiEnable": "Activer le tri Jev via OpenRouter",
+      "aiDesc": "Envoie les noms, tailles et règles correspondantes à OpenRouter pour suggérer Conserver ou Corbeille. Le contenu des fichiers n'est jamais envoyé.",
+      "aiApiKey": "Clé API OpenRouter",
+      "aiApiKeyPlaceholder": "sk-or-v1-...",
+      "aiModel": "Modèle",
+      "aiModelHelp": "Par défaut : typesafe/jev-1.14. La clé et le modèle sont stockés localement.",
+      "aiKeySaved": "Key saved in Windows Credential Manager.",
+      "aiKeyMissing": "No API key saved.",
+      "aiKeySave": "Save key",
+      "aiKeyRemove": "Remove key"
     },
     "ignore": {
       "title": "Ignorer",
@@ -255,6 +266,19 @@
       "history.conflict": "Un fichier existe déjà à l'emplacement d'origine. Rien n'a été écrasé.",
       "history.changed": "Le fichier organisé a changé depuis l'opération. Il n'a pas été déplacé.",
       "history.unverified": "Cette ancienne opération n'a pas de données de vérification. Restaurez le fichier manuellement."
-    }
+    },
+    "aiClassify": "Catégoriser avec Jev",
+    "aiClassifying": "Interrogation de Jev…",
+    "aiKeep": "Conserver",
+    "aiTrash": "Corbeille",
+    "aiUnsure": "Incertain",
+    "aiSelectKeep": "Sélectionner les éléments à conserver",
+    "aiTrashPicks": "Déplacer {{count}} suggestions de corbeille vers la Corbeille",
+    "aiTrashConfirm": "Déplacer {{count}} fichier(s) vers la corbeille du système ? Vous pourrez les restaurer plus tard depuis la Corbeille.",
+    "aiSummary": "Jev suggère de conserver {{keep}} et de mettre {{trash}} à la corbeille ({{unsure}} incertains).",
+    "aiNotConfigured": "Ajoutez une clé API OpenRouter dans les Réglages pour utiliser le tri Jev.",
+    "aiDisabled": "Activez d'abord le tri Jev dans les Réglages.",
+    "aiFailed": "Échec du tri Jev : {{error}}",
+    "aiHelp": "Les suggestions de Jev proviennent d'OpenRouter et sont indicatives. Rien n'est supprimé automatiquement."
   }
 }

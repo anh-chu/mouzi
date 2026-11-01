@@ -111,7 +111,18 @@
       "gracePeriodCustom": "自定义",
       "gracePeriodMaxError": "等待时间不能超过 7 天",
       "autoUpdates": "自动检查更新",
-      "autoUpdatesDesc": "检查 Mouzi 新版本，并提供一键安装。"
+      "autoUpdatesDesc": "检查 Mouzi 新版本，并提供一键安装。",
+      "aiTitle": "AI 文件分类",
+      "aiEnable": "通过 OpenRouter 启用 Jev 分类",
+      "aiDesc": "将文件名、大小和匹配的规则发送到 OpenRouter，以建议保留或移至回收站。文件内容绝不会上传。",
+      "aiApiKey": "OpenRouter API 密钥",
+      "aiApiKeyPlaceholder": "sk-or-v1-...",
+      "aiModel": "模型",
+      "aiModelHelp": "默认：typesafe/jev-1.14。密钥和模型保存在本地。",
+      "aiKeySaved": "Key saved in Windows Credential Manager.",
+      "aiKeyMissing": "No API key saved.",
+      "aiKeySave": "Save key",
+      "aiKeyRemove": "Remove key"
     },
     "ignore": {
       "title": "忽略",
@@ -255,6 +266,19 @@
       "history.conflict": "原路径已存在文件。未覆盖任何内容。",
       "history.changed": "文件在整理后已更改。未移动该文件。",
       "history.unverified": "此旧操作没有验证记录。请手动恢复文件。"
-    }
+    },
+    "aiClassify": "用 Jev 分类",
+    "aiClassifying": "正在询问 Jev…",
+    "aiKeep": "保留",
+    "aiTrash": "回收站",
+    "aiUnsure": "不确定",
+    "aiSelectKeep": "选择保留项",
+    "aiTrashPicks": "将 {{count}} 个回收站建议移至回收站",
+    "aiTrashConfirm": "将 {{count}} 个文件移至系统回收站？之后可以从回收站恢复。",
+    "aiSummary": "Jev 建议保留 {{keep}} 个并移至回收站 {{trash}} 个（{{unsure}} 个不确定）。",
+    "aiNotConfigured": "在设置中添加 OpenRouter API 密钥以使用 Jev 分类。",
+    "aiDisabled": "请先在设置中启用 Jev 分类。",
+    "aiFailed": "Jev 分类失败：{{error}}",
+    "aiHelp": "Jev 的建议来自 OpenRouter，仅供参考。不会自动删除任何内容。"
   }
 }

@@ -546,6 +546,54 @@ pub fn apply(id: &str, selected: &[String]) -> Result<Vec<OperationResult>, Stri
     Ok(results)
 }
 
+pub fn trash_selected(paths: Vec<String>) -> Result<Vec<OperationResult>, String> {
+    let _guard = OPERATION_LOCK.lock().unwrap();
+    let run_id = new_run_id();
+    let mut results = Vec::new();
+    for source in paths {
+        let result = (|| -> Result<(), String> {
+            let path = Path::new(&source);
+            if !watched_file(path)
+                || db::is_baseline_file(path)
+                || rules::should_ignore_file(path)
+                || rules::is_file_ignored_by_mouziignore(path)
+            {
+                return Err("preview.changed".into());
+            }
+            if rules::is_file_locked(path) {
+                return Err("preview.locked".into());
+            }
+            let file = rules::scan_file(path).ok_or("preview.changed")?;
+            let hash = fingerprint(path)?;
+            trash::delete(path).map_err(|e| e.to_string())?;
+            db::log_action(&ActionLog {
+                id: None,
+                timestamp: Utc::now(),
+                source_path: source.clone(),
+                destination_path: None,
+                action: "delete".into(),
+                file_name: file.name,
+                file_type: "AI triage".into(),
+                undone: false,
+                run_id: Some(run_id.clone()),
+                trigger: "approved".into(),
+                file_extension: file.extension,
+                file_size: file.size,
+                fingerprint: Some(hash),
+            })
+            .map_err(|e| format!("File moved to Trash but history could not be saved: {e}"))?;
+            Ok(())
+        })();
+        results.push(OperationResult {
+            id: source.clone(),
+            source,
+            success: result.is_ok(),
+            error: result.err(),
+        });
+    }
+    Ok(results)
+}
+
 pub fn undo_one(id: i64) -> Result<bool, String> {
     let db = db::get_db();
     let log = db.lock().unwrap().query_row("SELECT source_path,destination_path,fingerprint FROM action_logs WHERE id=?1 AND undone=0 AND action IN ('move','rename')", [id], |r| Ok((r.get::<_,String>(0)?, r.get::<_,String>(1)?, r.get::<_,Option<String>>(2)?))).map_err(|e| e.to_string())?;

@@ -111,7 +111,18 @@
       "gracePeriodCustom": "Benutzerdefiniert",
       "gracePeriodMaxError": "Grace-Zeitraum darf 7 Tage nicht überschreiten",
       "autoUpdates": "Automatisch nach Updates suchen",
-      "autoUpdatesDesc": "Nach neuen Mouzi-Versionen suchen und Installation mit einem Klick anbieten."
+      "autoUpdatesDesc": "Nach neuen Mouzi-Versionen suchen und Installation mit einem Klick anbieten.",
+      "aiTitle": "KI-Dateiprüfung",
+      "aiEnable": "Jev-Prüfung über OpenRouter aktivieren",
+      "aiDesc": "Sendet Dateinamen, Größen und passende Regeln an OpenRouter für einen Behalten-oder-Papierkorb-Vorschlag. Dateiinhalte werden nie hochgeladen.",
+      "aiApiKey": "OpenRouter-API-Schlüssel",
+      "aiApiKeyPlaceholder": "sk-or-v1-...",
+      "aiModel": "Modell",
+      "aiModelHelp": "Standard: typesafe/jev-1.14. Schlüssel und Modell werden lokal gespeichert.",
+      "aiKeySaved": "Key saved in Windows Credential Manager.",
+      "aiKeyMissing": "No API key saved.",
+      "aiKeySave": "Save key",
+      "aiKeyRemove": "Remove key"
     },
     "ignore": {
       "title": "Ignorieren",
@@ -255,6 +266,19 @@
       "history.conflict": "Am ursprünglichen Pfad liegt bereits eine Datei. Nichts wurde überschrieben.",
       "history.changed": "Die organisierte Datei wurde seit der Aktion geändert. Sie wurde nicht verschoben.",
       "history.unverified": "Für diese ältere Aktion fehlen Prüfdaten. Stelle die Datei manuell wieder her."
-    }
+    },
+    "aiClassify": "Mit Jev kategorisieren",
+    "aiClassifying": "Jev wird gefragt…",
+    "aiKeep": "Behalten",
+    "aiTrash": "Papierkorb",
+    "aiUnsure": "Unsicher",
+    "aiSelectKeep": "Behaltene auswählen",
+    "aiTrashPicks": "{{count}} Papierkorb-Vorschläge in den Papierkorb",
+    "aiTrashConfirm": "{{count}} Datei(en) in den Systempapierkorb verschieben? Sie können sie später aus dem Papierkorb wiederherstellen.",
+    "aiSummary": "Jev schlägt vor, {{keep}} zu behalten und {{trash}} in den Papierkorb zu legen ({{unsure}} unsicher).",
+    "aiNotConfigured": "Fügen Sie in den Einstellungen einen OpenRouter-API-Schlüssel hinzu, um die Jev-Prüfung zu nutzen.",
+    "aiDisabled": "Aktivieren Sie zuerst die Jev-Prüfung in den Einstellungen.",
+    "aiFailed": "Jev-Prüfung fehlgeschlagen: {{error}}",
+    "aiHelp": "JeVs Vorschläge stammen von OpenRouter und sind unverbindlich. Nichts wird automatisch gelöscht."
   }
 }

@@ -140,6 +140,19 @@ export default function Settings() {
   const [graceValue, setGraceValue] = useState(300);
   const [graceUnit, setGraceUnit] = useState<GraceUnit>("seconds");
   const [graceError, setGraceError] = useState<string | null>(null);
+  const [aiKey, setAiKey] = useState("");
+  const [aiKeySaved, setAiKeySaved] = useState(false);
+  const [aiKeyError, setAiKeyError] = useState("");
+  const [aiKeyBusy, setAiKeyBusy] = useState(false);
+  useEffect(() => {
+    invoke<boolean>("ai_key_status_cmd").then(setAiKeySaved).catch(e => setAiKeyError(errorText(e)));
+  }, []);
+  const [aiModel, setAiModel] = useState("typesafe/jev-1.14");
+
+  useEffect(() => {
+    if (!settings) return;
+    setAiModel(settings.ai_model || "typesafe/jev-1.14");
+  }, [settings?.ai_model]);
 
   const [localSchedule, setLocalSchedule] = useState<ScheduleSettings>(defaultSchedule());
   const [ruleToast, setRuleToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -963,6 +976,80 @@ export default function Settings() {
                       }`}
                   />
                 </button>
+              </div>
+
+              {/* AI triage */}
+              <div className="border-t border-border pt-4 space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <label className="text-sm font-medium text-text-muted">
+                      {t("settings.general.aiEnable")}
+                    </label>
+                    <p className="text-xs text-text-muted">{t("settings.general.aiDesc")}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (!settings) return;
+                      saveSettings({ ...settings, ai_enabled: !settings.ai_enabled });
+                    }}
+                    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${settings?.ai_enabled ? "bg-primary" : "bg-surface-dark"
+                      }`}
+                    role="switch"
+                    aria-checked={settings?.ai_enabled || false}
+                    aria-label={t("settings.general.aiEnable")}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings?.ai_enabled ? "translate-x-6" : "translate-x-1"
+                        }`}
+                    />
+                  </button>
+                </div>
+                <label className="block text-sm">
+                  {t("settings.general.aiApiKey")}
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    spellCheck={false}
+                    value={aiKey}
+                    onChange={(e) => setAiKey(e.target.value)}
+                    placeholder={t("settings.general.aiApiKeyPlaceholder")}
+                    className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary"
+                  />
+                </label>
+                <p className="text-xs text-text-muted">{t(aiKeySaved ? "settings.general.aiKeySaved" : "settings.general.aiKeyMissing")}</p>
+                <div className="flex gap-2">
+                  <button type="button" disabled={aiKeyBusy || !aiKey.trim()} className="rounded-md border border-border px-3 py-1 text-sm disabled:opacity-50" onClick={async () => {
+                    setAiKeyBusy(true); setAiKeyError("");
+                    try { await invoke("save_ai_key_cmd", { key: aiKey }); setAiKey(""); setAiKeySaved(true); }
+                    catch (e) { setAiKeyError(errorText(e)); } finally { setAiKeyBusy(false); }
+                  }}>{t("settings.general.aiKeySave")}</button>
+                  <button type="button" disabled={aiKeyBusy || !aiKeySaved} className="rounded-md border border-border px-3 py-1 text-sm disabled:opacity-50" onClick={async () => {
+                    setAiKeyBusy(true); setAiKeyError("");
+                    try { await invoke("remove_ai_key_cmd"); setAiKey(""); setAiKeySaved(false); }
+                    catch (e) { setAiKeyError(errorText(e)); } finally { setAiKeyBusy(false); }
+                  }}>{t("settings.general.aiKeyRemove")}</button>
+                </div>
+                {aiKeyError && <p role="alert" className="text-sm text-red-500">{aiKeyError}</p>}
+                <label className="block text-sm">
+                  {t("settings.general.aiModel")}
+                  <input
+                    type="text"
+                    spellCheck={false}
+                    value={aiModel}
+                    onChange={(e) => setAiModel(e.target.value)}
+                    onBlur={() => {
+                      const model = aiModel.trim() || "typesafe/jev-1.14";
+                      setAiModel(model);
+                      if (settings && model !== settings.ai_model) {
+                        saveSettings({ ...settings, ai_model: model });
+                      }
+                    }}
+                    className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary"
+                  />
+                  <span className="mt-1 block text-xs text-text-muted">
+                    {t("settings.general.aiModelHelp")}
+                  </span>
+                </label>
               </div>
 
             </div>
